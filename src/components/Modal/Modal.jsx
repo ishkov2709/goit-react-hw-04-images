@@ -7,15 +7,14 @@ const modalRoot = document.querySelector('#modal-root');
 
 const Modal = ({ url, value, reset }) => {
   useEffect(() => {
+    const handleKeyCloseModal = ({ code }) => {
+      if (code === 'Escape') return reset();
+    };
     window.addEventListener('keydown', handleKeyCloseModal);
     return () => {
       window.removeEventListener('keydown', handleKeyCloseModal);
     };
-  });
-
-  const handleKeyCloseModal = ({ code }) => {
-    if (code === 'Escape') return reset();
-  };
+  }, [reset]);
 
   const handleClickCloseModal = ({ currentTarget, target }) => {
     if (currentTarget === target) return reset();

@@ -9,7 +9,7 @@ import Loading from './Loader';
 import Modal from './Modal';
 
 export const App = () => {
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(1);
   const [value, setValue] = useState('');
   const [gallery, setGallery] = useState([]);
   const [status, setStatus] = useState('idle');
@@ -18,28 +18,28 @@ export const App = () => {
   const [showBtn, setShowBtn] = useState(false);
 
   useEffect(() => {
-    if (page) {
-      async function fetchData() {
-        setStatus('panding');
-        try {
-          const {
-            data: { totalHits, hits },
-          } = await fetchImages(page, value);
-          setGallery(prevState => {
-            return [...prevState, ...hits];
-          });
-          setStatus('resolved');
-          setShowBtn(page < Math.ceil(totalHits / 12));
-          if (!hits.length) {
-            throw new Error();
-          }
-        } catch {
-          errorNotify();
-          setStatus('rejected');
+    if (!value) return;
+
+    async function fetchData() {
+      setStatus('panding');
+      try {
+        const {
+          data: { totalHits, hits },
+        } = await fetchImages(page, value);
+        if (!hits.length) {
+          throw new Error();
         }
+        setGallery(prevState => {
+          return [...prevState, ...hits];
+        });
+        setStatus('resolved');
+        setShowBtn(page < Math.ceil(totalHits / 12));
+      } catch {
+        errorNotify();
+        setStatus('rejected');
       }
-      fetchData();
     }
+    fetchData();
   }, [value, page]);
 
   const handleUpdateValue = currentValue => {
@@ -53,7 +53,7 @@ export const App = () => {
   };
 
   const handleIncrementPage = () => {
-    setPage(page + 1);
+    setPage(prevState => prevState + 1);
   };
 
   const handleUpdateImg = (url = '') => {
